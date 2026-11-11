@@ -1,0 +1,126 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SAFE-DD 실물자산 사고·복구 리스크 실사</title>
+<meta name="theme-color" content="#1f3a5f"><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icons/icon-192.png"><link rel="apple-touch-icon" href="/icons/icon-192.png">
+<meta name="description" content="티커를 입력하면 SEC 공시를 실시간으로 읽어 사고 문맥을 분류하고, 귀책·집중도·복구시간·보장 4변수를 원문 인용으로 채워 운용사 실사 요청 목록을 만드는 에이전트">
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#14213d;--mut:#5b6678;--line:#dde1e8;--acc:#0b5ed7;--bad:#c62828;--ok:#1b7f4b;--warn:#b26a00;--navy:#1f3a5f}
+@media (prefers-color-scheme:dark){:root{--bg:#10151d;--card:#18202b;--ink:#e8edf5;--mut:#9aa7ba;--line:#2a3544;--acc:#6aa4ff;--bad:#ff7b72;--ok:#5fd08e;--warn:#e0a458}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,"Noto Sans KR","Malgun Gothic",sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:max(16px,env(safe-area-inset-top)) 16px 60px}
+h1{font-size:24px;margin:8px 0 4px}h2{font-size:17px;margin:0 0 10px}.sub{color:var(--mut);margin:0 0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin:14px 0}
+.note{font-size:13px;color:var(--mut)}
+form{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end}
+@media(max-width:720px){form{grid-template-columns:1fr 1fr}form .w2{grid-column:1/3}}
+label{font-size:12.5px;color:var(--mut);display:block;margin-bottom:3px}
+input,button,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%}
+button{cursor:pointer}button.go{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:600;width:auto;padding:9px 18px}
+button:disabled{opacity:.55;cursor:wait}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.chips button{width:auto;padding:5px 12px;font-size:13.5px;border-radius:99px}
+.step{display:flex;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:14px}.step b{min-width:84px;color:var(--acc)}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.kpi div{background:var(--bg);border-radius:8px;padding:10px}.kpi strong{display:block;font-size:22px}
+blockquote{margin:6px 0;padding:8px 12px;border-left:3px solid var(--acc);background:var(--bg);font-size:13.5px;word-break:break-word}
+table{border-collapse:collapse;width:100%;font-size:14px}@media(max-width:520px){table{font-size:12.5px}th,td{padding:5px 4px}#evt{overflow-x:auto}}th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}th{color:var(--mut);font-weight:600}.n{text-align:right;font-variant-numeric:tabular-nums}
+.neg{color:var(--bad)}.tag{display:inline-block;padding:1px 8px;border-radius:99px;font-size:12px;border:1px solid var(--line)}.inc{color:var(--bad);border-color:var(--bad)}.non{color:var(--mut)}.pass{color:var(--ok);border-color:var(--ok)}.warn{color:var(--warn);border-color:var(--warn)}
+svg{width:100%;height:auto}a{color:var(--acc)}.err{color:var(--bad)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}.bar button{width:auto;padding:6px 14px}
+#install{display:none}
+@media print{body{background:#fff;color:#000}.noprint,form,.chips,#log,.card:not(#memo){display:none!important}#memo{display:block!important;border:0}.wrap{padding:0}}
+</style></head><body><div class="wrap">
+<h1>SAFE-DD <span style="font-weight:400;font-size:16px">투자 실물자산 사고·복구 리스크 실사 에이전트</span></h1>
+<p class="sub">티커를 입력하면 에이전트가 SEC 공시를 실시간으로 읽어 사고성 서술을 분류하고, 귀책·집중도·복구시간·보장 4변수를 <b>공시 원문 인용</b>으로 채워 <b>운용사 실사 요청 목록</b>과 1쪽 메모를 만듭니다. 투자 판단·권고는 하지 않습니다.</p>
+<div class="card noprint">
+<form id="f"><div class="w2"><label for="q">티커 또는 회사명 (미국 상장사)</label><input id="q" value="VST" autocomplete="off" required></div>
+<div><label for="lat">위도(선택)</label><input id="lat" inputmode="decimal" placeholder="36.8045"></div><div><label for="lon">경도(선택)</label><input id="lon" inputmode="decimal" placeholder="-121.7877"></div>
+<div class="w2"><button class="go" id="run" type="submit">실사 실행</button></div></form>
+<div class="chips" aria-label="예시 자산"><button type="button" data-q="VST" data-lat="36.8045" data-lon="-121.7877">Vistra · Moss Landing ESS</button><button type="button" data-q="FCX">Freeport-McMoRan</button><button type="button" data-q="EIX">Edison Intl</button><button type="button" data-q="HE">Hawaiian Electric</button><button type="button" data-q="JJSF">J&amp;J Snack Foods</button></div>
+<div class="bar"><span class="note">위·경도를 넣으면 사이트 기상·지진 지표도 조회합니다.</span><button type="button" id="replay">저장된 실행 재생(Vistra·Freeport)</button><button type="button" id="install">앱 설치</button></div>
+<p class="note" id="mode">실시간 실행은 SEC EDGAR를 직접 호출하며 1~2분 걸립니다(공시 최대 14건 판독).</p></div>
+<div id="log" class="card" style="display:none"></div><div id="out"></div>
+<div class="card noprint"><h2>사고 전후 초과수익 경로 (6건 이벤트 스터디, 사건 전날 = 0)</h2><div id="chart"></div>
+<p class="note">시장모형(추정창 t−250~t−30 거래일, 220일), 누적초과수익(복리 환산, %). 지수: S&amp;P500·KOSPI·Nikkei225. 귀책 사건(PG&amp;E·하와이안일렉트릭·에디슨)은 크고 설비 화재(카카오·르네사스)는 회복. 6건은 기술통계이며 일반화가 아닙니다. Vistra는 시장 민감도(β 2.05)가 높아 해석을 보류합니다.</p><div id="evt"></div></div>
+<p class="note noprint">데이터: SEC EDGAR(공공), Yahoo Finance chart, Open-Meteo(CC BY 4.0), USGS FDSN. 인용은 규칙으로 추출한 뒤 원문 부분일치를 점검하며, 귀책 같은 의미 판단은 사람이 확인해야 합니다. 분류기는 규칙 기반 v0로, 보류셋 정밀도 57.1%·재현율 44.4%(판독 30건)이므로 놓치는 사고가 있습니다. 현장 서베이를 대체하지 않는 방문 전 스크리닝 도구입니다.</p>
+</div>
+<script src="/data.js"></script>
+<script>
+const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const QUESTIONS={"집중도":"사이트별 매출·EBITDA 기여도, 단일 사이트 의존 비율(최대 사이트 비중)","복구시간(RTO)":"사이트별 복구목표시간·실제 DR 훈련 결과, 백업의 물리적 분리(다른 건물/지역) 여부","보장":"재산·영업중단(BI) 보험 한도·면책·공제액, 최근 5년 손실이력(loss run)","귀책·관리":"최근 소방·안전 점검 결과와 시정조치, 하도급 작업(정비·교체) 통제 절차(작업허가·LOTO)","설비":"배터리(리튬이온)·변압기 위치와 이격, 감지·소화설비 종류, 폭발방산 설계"};
+const VARS=["집중도","복구시간","보장","귀책·관리"];
+const MON=/(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2},\s+)?\d{4}/;
+const api=async q=>{const r=await fetch("/api/edgar?"+q);const j=await r.json().catch(()=>({error:"응답 해석 실패 "+r.status}));if(!r.ok||j.error)throw new Error(j.error||("HTTP "+r.status));return j};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let logN=0;function log(who,msg,cls){const l=$("log");l.style.display="block";l.insertAdjacentHTML("beforeend",`<div class="step"><b>${esc(who)}</b><span class="${cls||''}">${msg}</span></div>`);l.lastElementChild.scrollIntoView({block:"nearest"})}
+async function hazard(lat,lon){const y=new Date(Date.now()-5*864e5),s=new Date(y-365*864e5),f=d=>d.toISOString().slice(0,10);
+ const w=await (await fetch(`https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${f(s)}&end_date=${f(y)}&daily=wind_gusts_10m_max,temperature_2m_max,precipitation_sum&timezone=UTC`)).json();
+ const q=await (await fetch(`https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=${lat}&longitude=${lon}&maxradiuskm=300&minmagnitude=5.0&starttime=${f(new Date(Date.now()-3650*864e5))}&limit=200`)).json();
+ const d=w.daily,mx=a=>Math.max(...a.filter(x=>x!=null));
+ return {gust_max_kmh:mx(d.wind_gusts_10m_max),hot_days_ge35C:d.temperature_2m_max.filter(x=>x!=null&&x>=35).length,precip_max_mm:mx(d.precipitation_sum),quakes_M5_300km_10y:q.features.length}}
+function render(M){
+ const inc=M.groups,filled=VARS.filter(v=>M.vars[v]),ver=M.verify;
+ let h=`<div class="card"><h2>${esc(M.asset)} <span class="note">(${esc(M.ticker)} · CIK ${esc(M.cik)} · ${esc(M.mode)})</span></h2><div class="kpi">
+ <div><strong>${M.docs.length}</strong>읽은 공시(8-K·10-Q·10-K)</div><div><strong>${M.docs.filter(d=>d.cls==='incident').length}</strong>사고성 문맥으로 분류</div>
+ <div><strong>${inc.length}</strong>중복 제거 후 사고</div><div><strong>${filled.length}/4</strong>4변수 인용으로 채움</div>
+ <div><strong>${ver.ok}/${ver.total}</strong>인용 · 원문 일치(검증기)</div></div></div>`;
+ h+=`<div class="card"><h2>① 포착한 사고 (사건 단위 중복 제거)</h2>`+(inc.length?inc.map(g=>`<blockquote>“${esc(g.evidence)}”<br><span class="note">${g.n}개 공시에 반복 서술 · 조회 창 내 첫 공시 ${esc(g.first.date)} ${esc(g.first.form)} → <b>사고 1건</b></span> · <a href="${esc(g.first.url)}" target="_blank" rel="noopener">원문 공시 열기</a> <span class="tag ${g.ok?'pass':'warn'}">${g.ok?'원문 일치':'일치 미확인'}</span></blockquote>`).join(''):`<p>조회 창 안에서 사고성 서술을 찾지 못했습니다. 이는 사고가 없다는 뜻이 아니라, 규칙 분류기가 놓쳤을 수 있다는 뜻입니다(재현율 44.4%).</p>`)+`</div>`;
+ h+=`<div class="card"><h2>② 4변수 채움 (공시 원문 인용 · 규칙 추출)</h2><table>`+VARS.map(v=>{const c=M.vars[v];return c?`<tr><th>${v}</th><td>“${esc(c.quote)}”<br><a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.date)} ${esc(c.form)} 원문</a> · <span class="tag ${c.ok?'pass':'warn'}">${c.ok?'verified':'unverified'}</span></td></tr>`:`<tr><th>${v}</th><td class="note">공개자료로 못 채움 → 아래 ③ 실사 요청 목록으로 전환</td></tr>`}).join('')+`</table><p class="note">귀책 같은 의미 판단은 사람이 확인합니다. 인용은 규칙으로 뽑고 원문 부분일치를 점검했습니다.</p></div>`;
+ if(M.hazard)h+=`<div class="card"><h2>사이트 위험 지표 (최근 1년·10년)</h2><table><tr><th>지표</th><th class="n">값</th></tr><tr><td>최대 돌풍</td><td class="n">${M.hazard.gust_max_kmh} km/h</td></tr><tr><td>35℃ 이상 일수</td><td class="n">${M.hazard.hot_days_ge35C}일</td></tr><tr><td>최대 일 강수</td><td class="n">${M.hazard.precip_max_mm} mm</td></tr><tr><td>10년 내 M5.0↑ 지진(반경 300km)</td><td class="n">${M.hazard.quakes_M5_300km_10y}건</td></tr></table><p class="note">출처: Open-Meteo archive, USGS FDSN event API</p></div>`;
+ h+=`<div class="card"><h2>③ 운용사에 요청할 서류 (4변수 + 설비)</h2><table>`+Object.entries(QUESTIONS).map(([a,b])=>`<tr><th>${esc(a)}</th><td>${esc(b)}${(VARS.includes(a.split('(')[0])&&M.vars[a.split('(')[0]])?' <span class="note">· 공시에는 일부 인용만 있으므로 확인용</span>':''}</td></tr>`).join('')+`</table></div>`;
+ h+=`<div class="card" id="memo"><h2>④ 1쪽 메모 (근거 인용 포함)</h2><p><b>${esc(M.asset)}</b> · 공시 ${M.docs.length}건 판독 · 사고 ${inc.length}건 · 4변수 ${filled.length}/4 채움 · 작성 ${esc(M.at)}</p>
+ <p>${inc.length?`공시에서 ${esc(inc[0].first.date)} ${esc(inc[0].first.form)}가 가장 먼저 사고성 서술을 담았다(조회 창 기준). 아래 4변수는 원문 인용이며 의미 판단은 사람이 확인한다.`:'조회 창 안에서 사고성 서술을 포착하지 못했다. 규칙 분류기의 재현율이 낮아 사고가 없다는 결론은 아니다.'}</p>
+ <table>${VARS.map(v=>{const c=M.vars[v];return `<tr><th>${v}</th><td>${c?`“${esc(c.quote)}” — ${esc(c.date)} ${esc(c.form)}`:'공시에서 못 채움 → 운용사 요청'}</td></tr>`}).join('')}</table>
+ <p><b>모니터링 트리거(안)</b>: 신규 8-K의 사고·중단 서술 / 복구(재가동) 일정 변경 문구 / 보험 회수액·충당 변경 / 규제기관 합의·명령 신규 공시.</p>
+ <p class="note">SAFE-DD v0 · 규칙 기반(분류 보류셋 정밀도 57.1%·재현율 44.4%) · 투자 판단·권고 아님 · 방문 전 스크리닝 · 출처: SEC EDGAR</p>
+ <div class="bar noprint"><button type="button" onclick="window.print()">메모 인쇄·PDF 저장</button></div></div>`;
+ h+=`<div class="card"><h2>⑤ 읽은 공시 목록</h2><table><tr><th>일자</th><th>양식</th><th>분류</th></tr>`+M.docs.map(d=>`<tr><td>${esc(d.date)}</td><td><a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.form)}</a></td><td><span class="tag ${d.cls=='incident'?'inc':d.cls=='error'?'warn':'non'}">${d.cls=='incident'?'사고성':d.cls=='boilerplate'?'정형문구':d.cls=='error'?'오류':'무관'}</span></td></tr>`).join('')+`</table></div>`;
+ $("out").innerHTML=h;$("out").scrollIntoView({behavior:"smooth"})}
+function build(asset,ticker,cik,docs,analyses,mode,hz){
+ const bykey={};docs.forEach((d,i)=>{const a=analyses[i];d.cls=a?a.cls:"error";d.ev=a?a.evidence:"";if(d.cls==="incident"){const m=MON.exec(d.ev),k=m?m[0]:d.ev.slice(0,60);(bykey[k]=bykey[k]||[]).push({d,a})}});
+ const groups=Object.entries(bykey).map(([k,v])=>{v.sort((x,y)=>x.d.date<y.d.date?-1:1);return {key:k,n:v.length,first:v[0].d,evidence:v[0].a.evidence,ok:v[0].a.evidence_in_source!==false,items:v}});
+ const vars={};let ok=0,total=0;
+ groups.forEach(g=>g.items.forEach(({d,a})=>{total++;if(a.evidence_in_source!==false)ok++;for(const v of VARS){const c=a.vars&&a.vars[v];if(c&&!vars[v]){vars[v]={quote:c.quote,url:d.url,date:d.date,form:d.form,ok:c.substring_in_source!==false};}}}));
+ Object.values(vars).forEach(c=>{total++;if(c.ok)ok++});
+ return {asset,ticker,cik,docs,groups,vars,hazard:hz,mode,at:new Date().toISOString().slice(0,16).replace("T"," "),verify:{ok,total}}}
+async function runLive(q,lat,lon){
+ $("log").innerHTML="";$("out").innerHTML="";const btn=$("run");btn.disabled=true;
+ try{
+  log("Planner","자산 유형(미국 상장사)에 맞춰 도구 선택: EDGAR 조회 → 문서 분석 → 4변수 추출"+(lat&&lon?" → Open-Meteo·USGS":""));
+  log("Collector",`EDGAR 티커·회사명 조회: ${esc(q)}`);const lk=await api("action=lookup&q="+encodeURIComponent(q));
+  if(!lk.results.length)throw new Error("해당 티커·회사명을 SEC 목록에서 찾지 못했습니다(미국 상장사만 조회)");
+  const c=lk.results[0];log("Collector",`${esc(c.title)} (${esc(c.ticker)}, CIK ${c.cik}) 확인`+(lk.results.length>1?` · 후보 ${lk.results.length}건 중 첫째 사용`:""));
+  const fl=await api("action=filings&cik="+c.cik);log("Collector",`최근 400일 공시 ${fl.filings.length}건(8-K·10-Q·10-K) 목록 수집`);
+  const an=[];for(let i=0;i<fl.filings.length;i++){const d=fl.filings[i];
+   let a=null;for(let t=0;t<2&&!a;t++){try{a=await api("action=analyze&company="+encodeURIComponent(fl.name)+"&url="+encodeURIComponent(d.url))}catch(e){if(t){log("Collector",`${d.date} ${d.form} 도구 오류: ${esc(e.message)} → 건너뜀`,"err")}else{log("Collector",`${d.date} ${d.form} 재시도`);await sleep(1500)}}}
+   an.push(a);if(a)log("Classifier",`${d.date} ${d.form} → ${a.cls==='incident'?'<b class="neg">사고성</b>':a.cls==='boilerplate'?'정형문구':'무관'}`+(a.site?` (사이트 키워드: ${esc(a.site)})`:""))}
+  let hz=null;if(lat&&lon){try{log("Collector","Open-Meteo·USGS 사이트 위험 조회");hz=await hazard(lat,lon)}catch(e){log("Collector","기상·지진 조회 실패: "+esc(e.message),"err")}}
+  log("Assessor","사고 월·일 기준 중복 제거 후 4변수 문장을 공시 원문 인용으로 채움");
+  const M=build(fl.name,c.ticker,c.cik,fl.filings,an,"실시간 실행",hz);
+  log("Verifier",`인용 ${M.verify.total}건 중 ${M.verify.ok}건이 원문 본문에 부분문자열로 존재 → <span class="tag ${M.verify.ok===M.verify.total?'pass':'warn'}">${M.verify.ok===M.verify.total?'통과':'일부 미확인'}</span>`);
+  log("Writer","근거 달린 메모 + 실사 요청 목록 생성");render(M)
+ }catch(e){log("오류",esc(e.message)+" — 저장된 실행 재생으로 결과 형식을 볼 수 있습니다.","err")}
+ finally{btn.disabled=false}}
+function replay(k){const r=REPLAY[k];$("log").innerHTML="";$("log").style.display="none";
+ const docs=r.docs.map(d=>({date:d.date,form:d.form,url:d.url,cls:d.cls}));
+ const an=r.docs.map(d=>{if(d.cls!=="incident")return {cls:d.cls,evidence:d.evidence||""};
+  const vars={};r.claims.filter(c=>c.var).forEach(c=>{vars[c.var]={quote:c.quote,substring_in_source:c.substring_in_source!==false}});return {cls:"incident",evidence:d.evidence,evidence_in_source:true,vars}});
+ const M=build(r.filer||r.asset,r.ticker,"",docs,an,"저장된 실행 재생(2026-11-10~11)",r.hazard);
+ // 재생은 첫 사고 문서 기준 URL 보정
+ render(M)}
+$("f").addEventListener("submit",e=>{e.preventDefault();runLive($("q").value.trim(),$("lat").value.trim(),$("lon").value.trim())});
+document.querySelectorAll(".chips button").forEach(b=>b.onclick=()=>{$("q").value=b.dataset.q;$("lat").value=b.dataset.lat||"";$("lon").value=b.dataset.lon||"";$("f").requestSubmit()});
+$("replay").onclick=()=>replay("VST");
+// chart
+(function(){const W=900,H=360,m={l:50,r:150,t:14,b:36};const ev=EVENTS;const ys=ev.flatMap(e=>e.y);const y0=Math.min(...ys,-70),y1=Math.max(...ys,10);
+ const X=i=>m.l+i*(W-m.l-m.r)/21,Y=v=>m.t+(y1-v)*(H-m.t-m.b)/(y1-y0);const cols=["#c62828","#e07b00","#8e44ad","#7f8c8d","#0b5ed7","#1b7f4b"];
+ let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="사고 전후 누적초과수익 경로">`;
+ for(let v=Math.ceil(y0/20)*20;v<=y1;v+=20)s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="currentColor" opacity=".15"/><text x="${m.l-6}" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="currentColor">${v}%</text>`;
+ [0,5,10,15,20].forEach(d=>{s+=`<text x="${X(d+1)}" y="${H-12}" text-anchor="middle" font-size="11" fill="currentColor">${d?'+'+d:'0'}일</text>`});
+ const lab=ev.map((e,j)=>({j,y:Y(e.y[e.y.length-1]),n:e.name.split(' ')[0]})).sort((a,b)=>a.y-b.y);for(let i=1;i<lab.length;i++)if(lab[i].y-lab[i-1].y<14)lab[i].y=lab[i-1].y+14;
+ ev.forEach((e,j)=>{s+=`<polyline points="${e.y.map((v,i)=>`${X(i)},${Y(v)}`).join(' ')}" fill="none" stroke="${cols[j]}" stroke-width="2.2"/>`});
+ lab.forEach(l=>{s+=`<text x="${W-m.r+6}" y="${l.y+4}" font-size="11.5" fill="${cols[l.j]}">${l.n}</text>`});
+ $("chart").innerHTML=s+'</svg>';
+ $("evt").innerHTML='<table><tr><th>사건</th><th class="n">CAR[0,1]</th><th class="n">CAR[0,5]</th><th class="n">CAR[0,20]</th><th class="n">β</th></tr>'+ev.map(e=>`<tr><td>${esc(e.name)} (${esc(e.t0)})</td><td class="n neg">${e.car1}%</td><td class="n neg">${e.car5}%</td><td class="n ${e.car20<-1?'neg':''}">${e.car20}%</td><td class="n">${e.beta}</td></tr>`).join('')+'</table>'})();
+// PWA
+if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});
+let dp=null;addEventListener("beforeinstallprompt",e=>{e.preventDefault();dp=e;$("install").style.display="inline-block"});
+$("install").onclick=async()=>{if(dp){dp.prompt();dp=null;$("install").style.display="none"}};
+</script></body></html>

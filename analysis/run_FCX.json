@@ -1,0 +1,200 @@
+{
+ "asset": "Freeport-McMoRan",
+ "ticker": "FCX",
+ "filer": "FREEPORT-MCMORAN INC",
+ "run_at": "2026-11-10T13:01",
+ "claims": [
+  {
+   "id": "I1",
+   "text": "2026-02-13 10-K 사고성 서술 포착",
+   "url": "https://www.sec.gov/Archives/edgar/data/831259/000083125926000012/fcx-20251231.htm",
+   "quote": "In October 2024, during start-up activities, a fire occurred that required a temporary suspension of smelting operations to complete repairs.",
+   "status": "sourced"
+  },
+  {
+   "id": "H1",
+   "text": "최근 1년 최대 돌풍 57.2 km/h, 35℃↑ 0일, 10년 내 M5.0↑ 지진 103건(반경 300km)",
+   "url": "https://open-meteo.com/en/docs/historical-weather-api",
+   "quote": "Open-Meteo archive + USGS FDSN event API 조회 결과",
+   "status": "sourced"
+  }
+ ],
+ "incident_groups": {
+  "October 2024": {
+   "first_filing": "2026-02-13",
+   "filings": 4
+  }
+ },
+ "summary": {
+  "docs_read": 14,
+  "incident_context": 4,
+  "unique_incidents": 1,
+  "boilerplate": 0,
+  "none": 10,
+  "errors": 0
+ },
+ "hazard": {
+  "gust_max_kmh": 57.2,
+  "hot_days_ge35C": 0,
+  "precip_max_mm": 58.3,
+  "quakes_M5_300km_10y": 103,
+  "src": [
+   "open-meteo archive",
+   "USGS FDSN event API"
+  ]
+ },
+ "questions_for_GP": {
+  "집중도": "사이트별 매출·EBITDA 기여도, 단일 사이트 의존 비율(최대 사이트 비중)",
+  "복구시간(RTO)": "사이트별 복구목표시간·실제 DR 훈련 결과, 백업의 물리적 분리(다른 건물/지역) 여부",
+  "보장": "재산·영업중단(BI) 보험 한도·면책·공제액, 최근 5년 손실이력(loss run)",
+  "귀책·관리": "최근 소방·안전 점검 결과와 시정조치, 하도급 작업(정비·교체) 통제 절차(작업허가·LOTO)",
+  "설비": "배터리(리튬이온)·변압기 위치와 이격, 감지·소화설비 종류, 폭발방산 설계"
+ },
+ "docs": [
+  {
+   "form": "10-Q",
+   "date": "2026-11-06",
+   "items": "",
+   "acc": "0000831259-26-000051",
+   "doc": "fcx-20260930.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/831259/000083125926000051/fcx-20260930.htm",
+   "cls": "incident",
+   "evidence": "During start-up activities, a fire that occurred in October 2024 resulted in a temporary suspension of smelting operations to complete repairs."
+  },
+  {
+   "form": "8-K",
+   "date": "2026-11-04",
+   "items": "8.01,9.01",
+   "acc": "0000831259-26-000048",
+   "doc": "fcx-20261104.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/831259/000083125926000048/fcx-20261104.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "8-K",
+   "date": "2026-10-27",
+   "items": "2.02,7.01,9.01",
+   "acc": "0000831259-26-000045",
+   "doc": "fcx-20261027.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/831259/000083125926000045/fcx-20261027.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "8-K",
+   "date": "2026-10-02",
+   "items": "2.02,7.01,9.01",
+   "acc": "0000831259-26-000043",
+   "doc": "fcx-20261002.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/831259/000083125926000043/fcx-20261002.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "8-K",
+   "date": "2026-09-08",
+   "items": "8.01",
+   "acc": "0000831259-26-000038",
+   "doc": "fcx-20260901.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/831259/000083125926000038/fcx-20260901.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "10-Q",
+   "date": "2026-08-06",
+   "items": "",
+   "acc": "0000831259-26-000036",
+   "doc": "fcx-20260630.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/831259/000083125926000036/fcx-20260630.htm",
+   "cls": "incident",
+   "evidence": "In October 2024, during start-up activities, a fire occurred that required temporary suspension of smelting operations to complete repairs."
+  },
+  {
+   "form": "8-K",
+   "date": "2026-07-23",
+   "items": "2.02,7.01,9.01",
+   "acc": "0000831259-26-000033",
+   "doc": "fcx-20260723.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/831259/000083125926000033/fcx-20260723.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "8-K",
+   "date": "2026-06-10",
+   "items": "5.07",
+   "acc": "0000831259-26-000030",
+   "doc": "fcx-20260610.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/831259/000083125926000030/fcx-20260610.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "8-K",
+   "date": "2026-05-20",
+   "items": "1.01,1.02,2.03,9.01",
+   "acc": "0000831259-26-000027",
+   "doc": "fcx-20260514.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/831259/000083125926000027/fcx-20260514.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "10-Q",
+   "date": "2026-05-08",
+   "items": "",
+   "acc": "0000831259-26-000025",
+   "doc": "fcx-20260331.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/831259/000083125926000025/fcx-20260331.htm",
+   "cls": "incident",
+   "evidence": "In October 2024, during start-up activities, a fire occurred that required temporary suspension of smelting operations to complete repairs."
+  },
+  {
+   "form": "8-K",
+   "date": "2026-04-23",
+   "items": "2.02,7.01,9.01",
+   "acc": "0000831259-26-000021",
+   "doc": "fcx-20260423.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/831259/000083125926000021/fcx-20260423.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "8-K",
+   "date": "2026-03-23",
+   "items": "5.02",
+   "acc": "0000831259-26-000018",
+   "doc": "fcx-20260320.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/831259/000083125926000018/fcx-20260320.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "8-K",
+   "date": "2026-02-24",
+   "items": "8.01,9.01",
+   "acc": "0000831259-26-000014",
+   "doc": "fcx-20260218.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/831259/000083125926000014/fcx-20260218.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "10-K",
+   "date": "2026-02-13",
+   "items": "",
+   "acc": "0000831259-26-000012",
+   "doc": "fcx-20251231.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/831259/000083125926000012/fcx-20251231.htm",
+   "cls": "incident",
+   "evidence": "In October 2024, during start-up activities, a fire occurred that required a temporary suspension of smelting operations to complete repairs."
+  }
+ ],
+ "verifier": {
+  "total": 2,
+  "unverified": [],
+  "pass_": true
+ }
+}

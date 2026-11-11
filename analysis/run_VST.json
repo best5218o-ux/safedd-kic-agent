@@ -1,0 +1,200 @@
+{
+ "asset": "Vistra / Moss Landing",
+ "ticker": "VST",
+ "filer": "Vistra Corp.",
+ "run_at": "2026-11-10T13:02",
+ "claims": [
+  {
+   "id": "I1",
+   "text": "2026-05-08 10-Q 사고성 서술 포착",
+   "url": "https://www.sec.gov/Archives/edgar/data/1692819/000169281926000014/vistra-20260331.htm",
+   "quote": "LOSS EVENTS AND INSURANCE RECOVERIES Moss Landing 300 Incident On January 16, 2025, we detected a fire at our Moss Landing 300 MW energy storage facility at the Moss Landing Power Plant site (the Moss Landing Incident) that resulted in ceasing operations at all facilities at the Moss Landing complex",
+   "status": "sourced"
+  },
+  {
+   "id": "H1",
+   "text": "최근 1년 최대 돌풍 73.1 km/h, 35℃↑ 0일, 10년 내 M5.0↑ 지진 4건(반경 300km)",
+   "url": "https://open-meteo.com/en/docs/historical-weather-api",
+   "quote": "Open-Meteo archive + USGS FDSN event API 조회 결과",
+   "status": "sourced"
+  }
+ ],
+ "incident_groups": {
+  "January 16, 2025": {
+   "first_filing": "2026-05-08",
+   "filings": 3
+  }
+ },
+ "summary": {
+  "docs_read": 14,
+  "incident_context": 3,
+  "unique_incidents": 1,
+  "boilerplate": 0,
+  "none": 11,
+  "errors": 0
+ },
+ "hazard": {
+  "gust_max_kmh": 73.1,
+  "hot_days_ge35C": 0,
+  "precip_max_mm": 59.4,
+  "quakes_M5_300km_10y": 4,
+  "src": [
+   "open-meteo archive",
+   "USGS FDSN event API"
+  ]
+ },
+ "questions_for_GP": {
+  "집중도": "사이트별 매출·EBITDA 기여도, 단일 사이트 의존 비율(최대 사이트 비중)",
+  "복구시간(RTO)": "사이트별 복구목표시간·실제 DR 훈련 결과, 백업의 물리적 분리(다른 건물/지역) 여부",
+  "보장": "재산·영업중단(BI) 보험 한도·면책·공제액, 최근 5년 손실이력(loss run)",
+  "귀책·관리": "최근 소방·안전 점검 결과와 시정조치, 하도급 작업(정비·교체) 통제 절차(작업허가·LOTO)",
+  "설비": "배터리(리튬이온)·변압기 위치와 이격, 감지·소화설비 종류, 폭발방산 설계"
+ },
+ "docs": [
+  {
+   "form": "8-K",
+   "date": "2026-11-09",
+   "items": "8.01,9.01",
+   "acc": "0001140361-26-042795",
+   "doc": "ef20085053_8k.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/1692819/000114036126042795/ef20085053_8k.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "10-Q",
+   "date": "2026-11-09",
+   "items": "",
+   "acc": "0001692819-26-000025",
+   "doc": "vistra-20260930.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/1692819/000169281926000025/vistra-20260930.htm",
+   "cls": "incident",
+   "evidence": "LOSS EVENTS AND INSURANCE RECOVERIES Moss Landing 300 Incident On January 16, 2025, we experienced a fire at our Moss Landing 300 MW energy storage facility at the Moss Landing Power Plant site (the Moss Landing Incident) that resulted in ceasing operations at all facilities at the Moss Landing comp"
+  },
+  {
+   "form": "8-K",
+   "date": "2026-11-06",
+   "items": "2.02,9.01",
+   "acc": "0001692819-26-000023",
+   "doc": "vistra-20261106.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/1692819/000169281926000023/vistra-20261106.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "8-K",
+   "date": "2026-11-05",
+   "items": "2.01,2.03,3.02,7.01,9.01",
+   "acc": "0001140361-26-042013",
+   "doc": "ef20084950_8k.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/1692819/000114036126042013/ef20084950_8k.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "8-K",
+   "date": "2026-10-05",
+   "items": "1.01,2.03,9.01",
+   "acc": "0001140361-26-038468",
+   "doc": "ef20083016_8k.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/1692819/000114036126038468/ef20083016_8k.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "8-K",
+   "date": "2026-09-24",
+   "items": "1.01,8.01,9.01",
+   "acc": "0001140361-26-037577",
+   "doc": "ef20082680_8k.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/1692819/000114036126037577/ef20082680_8k.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "10-Q",
+   "date": "2026-08-10",
+   "items": "",
+   "acc": "0001692819-26-000019",
+   "doc": "vistra-20260630.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/1692819/000169281926000019/vistra-20260630.htm",
+   "cls": "incident",
+   "evidence": "LOSS EVENTS AND INSURANCE RECOVERIES Moss Landing 300 Incident On January 16, 2025, we experienced a fire at our Moss Landing 300 MW energy storage facility at the Moss Landing Power Plant site (the Moss Landing Incident) that resulted in ceasing operations at all facilities at the Moss Landing comp"
+  },
+  {
+   "form": "8-K",
+   "date": "2026-08-07",
+   "items": "2.02,9.01",
+   "acc": "0001692819-26-000017",
+   "doc": "vistra-20260807.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/1692819/000169281926000017/vistra-20260807.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "8-K",
+   "date": "2026-07-16",
+   "items": "1.01,2.03,9.01",
+   "acc": "0001140361-26-028619",
+   "doc": "ef20077984_8k.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/1692819/000114036126028619/ef20077984_8k.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "8-K",
+   "date": "2026-07-14",
+   "items": "8.01",
+   "acc": "0001140361-26-028454",
+   "doc": "ef20077988_8k.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/1692819/000114036126028454/ef20077988_8k.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "8-K",
+   "date": "2026-06-30",
+   "items": "1.01,2.03,9.01",
+   "acc": "0001140361-26-026944",
+   "doc": "ef20077059_8k.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/1692819/000114036126026944/ef20077059_8k.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "10-Q",
+   "date": "2026-05-08",
+   "items": "",
+   "acc": "0001692819-26-000014",
+   "doc": "vistra-20260331.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/1692819/000169281926000014/vistra-20260331.htm",
+   "cls": "incident",
+   "evidence": "LOSS EVENTS AND INSURANCE RECOVERIES Moss Landing 300 Incident On January 16, 2025, we detected a fire at our Moss Landing 300 MW energy storage facility at the Moss Landing Power Plant site (the Moss Landing Incident) that resulted in ceasing operations at all facilities at the Moss Landing complex"
+  },
+  {
+   "form": "8-K",
+   "date": "2026-05-07",
+   "items": "2.02,9.01",
+   "acc": "0001692819-26-000011",
+   "doc": "vistra-20260507.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/1692819/000169281926000011/vistra-20260507.htm",
+   "cls": "none",
+   "evidence": ""
+  },
+  {
+   "form": "8-K",
+   "date": "2026-05-04",
+   "items": "5.07",
+   "acc": "0001140361-26-018872",
+   "doc": "ef20072328_8k.htm",
+   "url": "https://www.sec.gov/Archives/edgar/data/1692819/000114036126018872/ef20072328_8k.htm",
+   "cls": "none",
+   "evidence": ""
+  }
+ ],
+ "verifier": {
+  "total": 2,
+  "unverified": [],
+  "pass_": true
+ }
+}
