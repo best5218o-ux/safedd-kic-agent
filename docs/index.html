@@ -41,7 +41,7 @@ svg{width:100%;height:auto}a{color:var(--acc)}.err{color:var(--bad)}
 <p class="note">시장모형(추정창 t−250~t−30 거래일, 220일), 누적초과수익(복리 환산, %). 지수: S&amp;P500·KOSPI·Nikkei225. 귀책 사건(PG&amp;E·하와이안일렉트릭·에디슨)은 크고 설비 화재(카카오·르네사스)는 회복. 6건은 기술통계이며 일반화가 아닙니다. Vistra는 시장 민감도(β 2.05)가 높아 해석을 보류합니다.</p><div id="evt"></div></div>
 <p class="note noprint">데이터: SEC EDGAR(공공), Yahoo Finance chart, Open-Meteo(CC BY 4.0), USGS FDSN. 인용은 규칙으로 추출한 뒤 원문 부분일치를 점검하며, 귀책 같은 의미 판단은 사람이 확인해야 합니다. 분류기는 규칙 기반 v0로, 보류셋 정밀도 57.1%·재현율 44.4%(판독 30건)이므로 놓치는 사고가 있습니다. 현장 서베이를 대체하지 않는 방문 전 스크리닝 도구입니다.</p>
 </div>
-<script src="data.js"></script>
+<script src="data.js"></script><script src="config.js"></script>
 <script>
 const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const QUESTIONS={"집중도":"사이트별 매출·EBITDA 기여도, 단일 사이트 의존 비율(최대 사이트 비중)","복구시간(RTO)":"사이트별 복구목표시간·실제 DR 훈련 결과, 백업의 물리적 분리(다른 건물/지역) 여부","보장":"재산·영업중단(BI) 보험 한도·면책·공제액, 최근 5년 손실이력(loss run)","귀책·관리":"최근 소방·안전 점검 결과와 시정조치, 하도급 작업(정비·교체) 통제 절차(작업허가·LOTO)","설비":"배터리(리튬이온)·변압기 위치와 이격, 감지·소화설비 종류, 폭발방산 설계"};
@@ -83,8 +83,29 @@ function build(asset,ticker,cik,docs,analyses,mode,hz){
  groups.forEach(g=>g.items.forEach(({d,a})=>{total++;if(a.evidence_in_source!==false)ok++;for(const v of VARS){const c=a.vars&&a.vars[v];if(c&&!vars[v]){vars[v]={quote:c.quote,url:d.url,date:d.date,form:d.form,ok:c.substring_in_source!==false};}}}));
  Object.values(vars).forEach(c=>{total++;if(c.ok)ok++});
  return {asset,ticker,cik,docs,groups,vars,hazard:hz,mode,at:new Date().toISOString().slice(0,16).replace("T"," "),verify:{ok,total}}}
+const API=(window.API_BASE||"").replace(/\/$/,"");
+const api=async q=>{const r=await fetch(API+"/?"+q);const j=await r.json().catch(()=>({error:"응답 해석 실패 "+r.status}));if(!r.ok||j.error)throw new Error(j.error||("HTTP "+r.status));return j};
+async function runFull(q,lat,lon){
+ $("log").innerHTML="";$("out").innerHTML="";const btn=$("run");btn.disabled=true;
+ try{
+  log("Planner","자산 유형(미국 상장사)에 맞춰 도구 선택: EDGAR 조회 → 문서 분석 → 4변수 추출"+(lat&&lon?" → Open-Meteo·USGS":""));
+  log("Collector",`EDGAR 티커·회사명 조회: ${esc(q)}`);const lk=await api("action=lookup&q="+encodeURIComponent(q));
+  if(!lk.results.length)throw new Error("해당 티커·회사명을 SEC 목록에서 찾지 못했습니다(미국 상장사만 조회)");
+  const c=lk.results[0];log("Collector",`${esc(c.title)} (${esc(c.ticker)}, CIK ${c.cik}) 확인`+(lk.results.length>1?` · 후보 ${lk.results.length}건 중 첫째 사용`:""));
+  const fl=await api("action=filings&cik="+c.cik);log("Collector",`최근 400일 공시 ${fl.filings.length}건(8-K·10-Q·10-K) 목록 수집`);
+  const an=[];for(let i=0;i<fl.filings.length;i++){const d=fl.filings[i];
+   let a=null;for(let t=0;t<2&&!a;t++){try{a=await api("action=analyze&company="+encodeURIComponent(fl.name)+"&url="+encodeURIComponent(d.url))}catch(e){if(t){log("Collector",`${d.date} ${d.form} 도구 오류: ${esc(e.message)} → 건너뜀`,"err")}else{log("Collector",`${d.date} ${d.form} 재시도`);await sleep(1500)}}}
+   an.push(a);if(a)log("Classifier",`${d.date} ${d.form} → ${a.cls==='incident'?'<b class="neg">사고성</b>':a.cls==='boilerplate'?'정형문구':'무관'}`+(a.site?` (사이트 키워드: ${esc(a.site)})`:""))}
+  let hz=null;if(lat&&lon){try{log("Collector","Open-Meteo·USGS 사이트 위험 조회");hz=await hazard(lat,lon)}catch(e){log("Collector","기상·지진 조회 실패: "+esc(e.message),"err")}}
+  log("Assessor","사고 월·일 기준 중복 제거 후 4변수 문장을 공시 원문 인용으로 채움");
+  const M=build(fl.name,c.ticker,c.cik,fl.filings,an,"실시간 실행",hz);
+  log("Verifier",`인용 ${M.verify.total}건 중 ${M.verify.ok}건이 원문 본문에 부분문자열로 존재 → <span class="tag ${M.verify.ok===M.verify.total?'pass':'warn'}">${M.verify.ok===M.verify.total?'통과':'일부 미확인'}</span>`);
+  log("Writer","근거 달린 메모 + 실사 요청 목록 생성");render(M)
+ }catch(e){log("오류",esc(e.message)+" — 저장된 실행 재생으로 결과 형식을 볼 수 있습니다.","err")}
+ finally{btn.disabled=false}}
 async function runLive(q,lat,lon){
  const key=q.toUpperCase();if(REPLAY[key]){replay(key);return}
+ if(API){return runFull(q,lat,lon)}
  $("log").innerHTML="";$("out").innerHTML="";const btn=$("run");btn.disabled=true;
  try{
   const cik=/^\d{3,10}$/.test(q)?+q:(TICKERS[key]||[])[0];
