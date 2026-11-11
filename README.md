@@ -4,15 +4,15 @@
 
 티커 하나를 입력하면 SEC EDGAR 공시(8-K·10-Q·10-K)를 읽어 사고성 서술을 분류하고, 같은 사건의 반복 서술을 한 건으로 묶은 뒤, **귀책·집중도·복구시간·보장** 4변수의 후보 문장을 **공시 원문 인용**으로 제시해 운용사 실사 요청 목록과 1쪽 메모를 만든다. 투자 판단·권고는 하지 않는다.
 
-- **실시간 데모(로그인 불필요):** https://safedd-kic-demo.netlify.app  (설치형 웹앱 PWA)
+- **웹앱(로그인 불필요, GitHub Pages):** https://best5218o-ux.github.io/safedd-kic-agent/  (설치형 웹앱 PWA)
 - **기획서(예선 PDF):** [docs/SAFE-DD_기획서.pdf](docs/SAFE-DD_기획서.pdf)
 
 ## 구성
 | 경로 | 내용 |
 |---|---|
-| `public/` | 정적 화면(PWA): 입력→에이전트 로그→사고·4변수·요청 목록·1쪽 메모, 6건 이벤트 스터디 그래프, 저장된 실행 재생 |
-| `netlify/functions/edgar.mjs` | 서버 도구: `lookup`(티커→CIK), `filings`(공시 목록), `analyze`(분류·중복 제거 후보·4변수 추출·원문 일치 점검). `judge`(LLM 판정)는 AI Gateway 연결 시 동작하는 코드로 포함 |
-| `analysis/` | 규칙 분류기 파이썬 원본, Vistra·Freeport 실행 결과, 이벤트 스터디 결과, 판독 표본 |
+| `docs/` | 정적 웹앱(PWA): Vistra·Freeport 저장된 실행 재생(사고 포착·4변수 인용·실사 요청 목록·1쪽 메모), 6건 이벤트 스터디 그래프, 임의 티커의 SEC 제출목록 조회 |
+| `analysis/safe_dd.py` | 에이전트 본체(파이썬, 키 불필요): 공시 수집 → 사고성 분류·중복 제거 → 4변수 인용 → 원문 일치 점검 → 실사 요청 목록 |
+| `analysis/` | Vistra·Freeport 실행 결과, 이벤트 스터디 결과·그림 코드, 판독 표본 |
 
 ## 현재 수준(v0, 있는 그대로)
 - 규칙 기반이며 LLM은 본선 단계에서 붙인다. 에이전트 순서는 고정(Planner 없음).
@@ -21,7 +21,8 @@
 - 이벤트 스터디 6건은 기술통계이며 일반화가 아니다. 귀책 3건은 모두 산불 유틸리티다.
 
 ## 실행
-Netlify에 연결한다(`publish = public`, `functions = netlify/functions`). 키는 필요 없고, SEC 요청에는 연락처가 담긴 User-Agent를 쓴다.
+- 웹: 위 주소를 연다. 저장된 실행은 즉시 재생되고, 다른 티커는 브라우저에서 SEC 제출목록(data.sec.gov)을 조회한다. SEC 본문 페이지는 브라우저에서 직접 읽을 수 없어 본문 판독은 아래 로컬 실행으로 한다.
+- 로컬 전체 실행: `python analysis/safe_dd.py --ticker VST --cik 1692819 --lat 36.8045 --lon -121.7877 --out run_VST.json` (파이썬 3, 외부 패키지 없음. SEC 요청에는 연락처가 담긴 User-Agent를 쓴다.)
 
 ## 데이터 출처
 SEC EDGAR(공공), Yahoo Finance 시세, Open-Meteo(CC BY 4.0), USGS FDSN. 투자 판단·권고가 아니다.

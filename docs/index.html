@@ -1,7 +1,7 @@
 <!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>SAFE-DD 실물자산 사고·복구 리스크 실사</title>
-<meta name="theme-color" content="#1f3a5f"><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icons/icon-192.png"><link rel="apple-touch-icon" href="/icons/icon-192.png">
-<meta name="description" content="티커를 입력하면 SEC 공시를 실시간으로 읽어 사고 문맥을 분류하고, 귀책·집중도·복구시간·보장 4변수를 원문 인용으로 채워 운용사 실사 요청 목록을 만드는 에이전트">
+<meta name="theme-color" content="#1f3a5f"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="description" content="투자 실물자산의 사고·복구 리스크를 SEC 공시 원문 인용으로 실사하는 에이전트 — 저장된 실행(Vistra·Freeport) 재생과 SEC 공시 목록 조회">
 <style>
 :root{--bg:#f6f7f9;--card:#fff;--ink:#14213d;--mut:#5b6678;--line:#dde1e8;--acc:#0b5ed7;--bad:#c62828;--ok:#1b7f4b;--warn:#b26a00;--navy:#1f3a5f}
 @media (prefers-color-scheme:dark){:root{--bg:#10151d;--card:#18202b;--ink:#e8edf5;--mut:#9aa7ba;--line:#2a3544;--acc:#6aa4ff;--bad:#ff7b72;--ok:#5fd08e;--warn:#e0a458}}
@@ -28,26 +28,29 @@ svg{width:100%;height:auto}a{color:var(--acc)}.err{color:var(--bad)}
 @media print{body{background:#fff;color:#000}.noprint,form,.chips,#log,.card:not(#memo){display:none!important}#memo{display:block!important;border:0}.wrap{padding:0}}
 </style></head><body><div class="wrap">
 <h1>SAFE-DD <span style="font-weight:400;font-size:16px">투자 실물자산 사고·복구 리스크 실사 에이전트</span></h1>
-<p class="sub">티커를 입력하면 에이전트가 SEC 공시를 실시간으로 읽어 사고성 서술을 분류하고, 귀책·집중도·복구시간·보장 4변수를 <b>공시 원문 인용</b>으로 채워 <b>운용사 실사 요청 목록</b>과 1쪽 메모를 만듭니다. 투자 판단·권고는 하지 않습니다.</p>
+<p class="sub">에이전트가 SEC 공시를 읽어 사고성 서술을 분류하고, 귀책·집중도·복구시간·보장 4변수를 <b>공시 원문 인용</b>으로 채워 <b>운용사 실사 요청 목록</b>과 1쪽 메모를 만듭니다. 투자 판단·권고는 하지 않습니다.</p>
 <div class="card noprint">
-<form id="f"><div class="w2"><label for="q">티커 또는 회사명 (미국 상장사)</label><input id="q" value="VST" autocomplete="off" required></div>
+<form id="f"><div class="w2"><label for="q">티커(VST·FCX는 저장된 실행 재생, 그 외는 SEC 제출목록)</label><input id="q" value="VST" autocomplete="off" required></div>
 <div><label for="lat">위도(선택)</label><input id="lat" inputmode="decimal" placeholder="36.8045"></div><div><label for="lon">경도(선택)</label><input id="lon" inputmode="decimal" placeholder="-121.7877"></div>
-<div class="w2"><button class="go" id="run" type="submit">실사 실행</button></div></form>
+<div class="w2"><button class="go" id="run" type="submit">실행</button></div></form>
 <div class="chips" aria-label="예시 자산"><button type="button" data-q="VST" data-lat="36.8045" data-lon="-121.7877">Vistra · Moss Landing ESS</button><button type="button" data-q="FCX">Freeport-McMoRan</button><button type="button" data-q="EIX">Edison Intl</button><button type="button" data-q="HE">Hawaiian Electric</button><button type="button" data-q="JJSF">J&amp;J Snack Foods</button></div>
-<div class="bar"><span class="note">위·경도를 넣으면 사이트 기상·지진 지표도 조회합니다.</span><button type="button" id="replay">저장된 실행 재생(Vistra·Freeport)</button><button type="button" id="install">앱 설치</button></div>
-<p class="note" id="mode">실시간 실행은 SEC EDGAR를 직접 호출하며 1~2분 걸립니다(공시 최대 14건 판독).</p></div>
+<div class="bar"><span class="note">위·경도를 넣으면 사이트 기상·지진 지표도 조회합니다.</span><button type="button" id="replay">Freeport 저장된 실행 재생</button><button type="button" id="install">앱 설치</button></div>
+<p class="note" id="mode">Vistra·Freeport는 2026-11-10~11 로컬 실행(공시 본문 판독) 결과를 재생합니다. 다른 티커는 SEC 제출목록을 브라우저에서 바로 조회합니다(SEC 본문은 브라우저 직접 접근이 막혀 있어 본문 판독은 로컬 실행).</p></div>
 <div id="log" class="card" style="display:none"></div><div id="out"></div>
 <div class="card noprint"><h2>사고 전후 초과수익 경로 (6건 이벤트 스터디, 사건 전날 = 0)</h2><div id="chart"></div>
 <p class="note">시장모형(추정창 t−250~t−30 거래일, 220일), 누적초과수익(복리 환산, %). 지수: S&amp;P500·KOSPI·Nikkei225. 귀책 사건(PG&amp;E·하와이안일렉트릭·에디슨)은 크고 설비 화재(카카오·르네사스)는 회복. 6건은 기술통계이며 일반화가 아닙니다. Vistra는 시장 민감도(β 2.05)가 높아 해석을 보류합니다.</p><div id="evt"></div></div>
 <p class="note noprint">데이터: SEC EDGAR(공공), Yahoo Finance chart, Open-Meteo(CC BY 4.0), USGS FDSN. 인용은 규칙으로 추출한 뒤 원문 부분일치를 점검하며, 귀책 같은 의미 판단은 사람이 확인해야 합니다. 분류기는 규칙 기반 v0로, 보류셋 정밀도 57.1%·재현율 44.4%(판독 30건)이므로 놓치는 사고가 있습니다. 현장 서베이를 대체하지 않는 방문 전 스크리닝 도구입니다.</p>
 </div>
-<script src="/data.js"></script>
+<script src="data.js"></script>
 <script>
 const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const QUESTIONS={"집중도":"사이트별 매출·EBITDA 기여도, 단일 사이트 의존 비율(최대 사이트 비중)","복구시간(RTO)":"사이트별 복구목표시간·실제 DR 훈련 결과, 백업의 물리적 분리(다른 건물/지역) 여부","보장":"재산·영업중단(BI) 보험 한도·면책·공제액, 최근 5년 손실이력(loss run)","귀책·관리":"최근 소방·안전 점검 결과와 시정조치, 하도급 작업(정비·교체) 통제 절차(작업허가·LOTO)","설비":"배터리(리튬이온)·변압기 위치와 이격, 감지·소화설비 종류, 폭발방산 설계"};
 const VARS=["집중도","복구시간","보장","귀책·관리"];
 const MON=/(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2},\s+)?\d{4}/;
-const api=async q=>{const r=await fetch("/api/edgar?"+q);const j=await r.json().catch(()=>({error:"응답 해석 실패 "+r.status}));if(!r.ok||j.error)throw new Error(j.error||("HTTP "+r.status));return j};
+const TICKERS={VST:[1692819,"Vistra Corp."],FCX:[831259,"Freeport-McMoRan Inc."],EIX:[827052,"Edison International"],HE:[354707,"Hawaiian Electric Industries"],JJSF:[785956,"J&J Snack Foods Corp."],PCG:[1004980,"PG&E Corp."],NEE:[753308,"NextEra Energy"],DUK:[1326160,"Duke Energy"],SO:[92122,"Southern Co."],AES:[874761,"AES Corp."],BE:[1664703,"Bloom Energy"],FLNC:[1868941,"Fluence Energy"]};
+async function filings(cik){const r=await fetch(`https://data.sec.gov/submissions/CIK${String(cik).padStart(10,"0")}.json`);if(!r.ok)throw new Error("SEC 제출목록 응답 "+r.status);const j=await r.json(),x=j.filings.recent,cut=new Date(Date.now()-400*864e5).toISOString().slice(0,10),out=[];
+ for(let i=0;i<x.form.length;i++){if(["8-K","10-Q","10-K"].includes(x.form[i])&&x.filingDate[i]>=cut)out.push({date:x.filingDate[i],form:x.form[i],items:x.items[i]||"",url:`https://www.sec.gov/Archives/edgar/data/${+cik}/${x.accessionNumber[i].replace(/-/g,"")}/${x.primaryDocument[i]}`})}
+ return {name:j.name,filings:out}}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 let logN=0;function log(who,msg,cls){const l=$("log");l.style.display="block";l.insertAdjacentHTML("beforeend",`<div class="step"><b>${esc(who)}</b><span class="${cls||''}">${msg}</span></div>`);l.lastElementChild.scrollIntoView({block:"nearest"})}
 async function hazard(lat,lon){const y=new Date(Date.now()-5*864e5),s=new Date(y-365*864e5),f=d=>d.toISOString().slice(0,10);
@@ -81,33 +84,29 @@ function build(asset,ticker,cik,docs,analyses,mode,hz){
  Object.values(vars).forEach(c=>{total++;if(c.ok)ok++});
  return {asset,ticker,cik,docs,groups,vars,hazard:hz,mode,at:new Date().toISOString().slice(0,16).replace("T"," "),verify:{ok,total}}}
 async function runLive(q,lat,lon){
+ const key=q.toUpperCase();if(REPLAY[key]){replay(key);return}
  $("log").innerHTML="";$("out").innerHTML="";const btn=$("run");btn.disabled=true;
  try{
-  log("Planner","자산 유형(미국 상장사)에 맞춰 도구 선택: EDGAR 조회 → 문서 분석 → 4변수 추출"+(lat&&lon?" → Open-Meteo·USGS":""));
-  log("Collector",`EDGAR 티커·회사명 조회: ${esc(q)}`);const lk=await api("action=lookup&q="+encodeURIComponent(q));
-  if(!lk.results.length)throw new Error("해당 티커·회사명을 SEC 목록에서 찾지 못했습니다(미국 상장사만 조회)");
-  const c=lk.results[0];log("Collector",`${esc(c.title)} (${esc(c.ticker)}, CIK ${c.cik}) 확인`+(lk.results.length>1?` · 후보 ${lk.results.length}건 중 첫째 사용`:""));
-  const fl=await api("action=filings&cik="+c.cik);log("Collector",`최근 400일 공시 ${fl.filings.length}건(8-K·10-Q·10-K) 목록 수집`);
-  const an=[];for(let i=0;i<fl.filings.length;i++){const d=fl.filings[i];
-   let a=null;for(let t=0;t<2&&!a;t++){try{a=await api("action=analyze&company="+encodeURIComponent(fl.name)+"&url="+encodeURIComponent(d.url))}catch(e){if(t){log("Collector",`${d.date} ${d.form} 도구 오류: ${esc(e.message)} → 건너뜀`,"err")}else{log("Collector",`${d.date} ${d.form} 재시도`);await sleep(1500)}}}
-   an.push(a);if(a)log("Classifier",`${d.date} ${d.form} → ${a.cls==='incident'?'<b class="neg">사고성</b>':a.cls==='boilerplate'?'정형문구':'무관'}`+(a.site?` (사이트 키워드: ${esc(a.site)})`:""))}
+  const cik=/^\d{3,10}$/.test(q)?+q:(TICKERS[key]||[])[0];
+  log("Planner","저장된 실행이 없는 자산 → 이 웹 화면은 SEC 제출목록 조회까지 수행(본문 판독은 analysis/safe_dd.py 로컬 실행)");
+  if(!cik)throw new Error("내장 티커 목록에 없습니다. 목록: "+Object.keys(TICKERS).join(", ")+" (또는 CIK 숫자를 직접 입력)");
+  log("Collector",`SEC EDGAR 제출목록 조회: ${esc(q)} (CIK ${cik})`);
+  const fl=await filings(cik);log("Collector",`${esc(fl.name)} 최근 400일 공시 ${fl.filings.length}건(8-K·10-Q·10-K)`);
   let hz=null;if(lat&&lon){try{log("Collector","Open-Meteo·USGS 사이트 위험 조회");hz=await hazard(lat,lon)}catch(e){log("Collector","기상·지진 조회 실패: "+esc(e.message),"err")}}
-  log("Assessor","사고 월·일 기준 중복 제거 후 4변수 문장을 공시 원문 인용으로 채움");
-  const M=build(fl.name,c.ticker,c.cik,fl.filings,an,"실시간 실행",hz);
-  log("Verifier",`인용 ${M.verify.total}건 중 ${M.verify.ok}건이 원문 본문에 부분문자열로 존재 → <span class="tag ${M.verify.ok===M.verify.total?'pass':'warn'}">${M.verify.ok===M.verify.total?'통과':'일부 미확인'}</span>`);
-  log("Writer","근거 달린 메모 + 실사 요청 목록 생성");render(M)
- }catch(e){log("오류",esc(e.message)+" — 저장된 실행 재생으로 결과 형식을 볼 수 있습니다.","err")}
+  $("out").innerHTML=`<div class="card"><h2>${esc(fl.name)} <span class="note">(CIK ${cik} · SEC 제출목록 실시간 조회)</span></h2>`+(hz?`<p class="note">최대 돌풍 ${hz.gust_max_kmh} km/h · 35℃ 이상 ${hz.hot_days_ge35C}일 · 반경 300km M5+ 지진(10년) ${hz.quakes_M5_300km_10y}건</p>`:"")+`<table><tr><th>일자</th><th>양식</th><th>항목</th></tr>`+fl.filings.map(d=>`<tr><td>${esc(d.date)}</td><td><a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.form)}</a></td><td>${esc(d.items)}</td></tr>`).join("")+`</table><p class="note">이 화면은 제출목록까지입니다. 본문 분류·4변수 추출·검증은 <code>python analysis/safe_dd.py --ticker ${esc(key)} --cik ${cik}</code> 로 실행하며, Vistra·Freeport 결과는 위 「저장된 실행 재생」에서 볼 수 있습니다.</p></div>`;
+  log("Writer","제출목록 표시 완료")
+ }catch(e){log("오류",esc(e.message),"err")}
  finally{btn.disabled=false}}
 function replay(k){const r=REPLAY[k];$("log").innerHTML="";$("log").style.display="none";
  const docs=r.docs.map(d=>({date:d.date,form:d.form,url:d.url,cls:d.cls}));
  const an=r.docs.map(d=>{if(d.cls!=="incident")return {cls:d.cls,evidence:d.evidence||""};
   const vars={};r.claims.filter(c=>c.var).forEach(c=>{vars[c.var]={quote:c.quote,substring_in_source:c.substring_in_source!==false}});return {cls:"incident",evidence:d.evidence,evidence_in_source:true,vars}});
- const M=build(r.filer||r.asset,r.ticker,"",docs,an,"저장된 실행 재생(2026-11-10~11)",r.hazard);
+ const M=build(r.filer||r.asset,r.ticker,(TICKERS[r.ticker]||[""])[0],docs,an,"저장된 실행 재생(2026-11-10~11)",r.hazard);
  // 재생은 첫 사고 문서 기준 URL 보정
  render(M)}
 $("f").addEventListener("submit",e=>{e.preventDefault();runLive($("q").value.trim(),$("lat").value.trim(),$("lon").value.trim())});
 document.querySelectorAll(".chips button").forEach(b=>b.onclick=()=>{$("q").value=b.dataset.q;$("lat").value=b.dataset.lat||"";$("lon").value=b.dataset.lon||"";$("f").requestSubmit()});
-$("replay").onclick=()=>replay("VST");
+$("replay").onclick=()=>replay("FCX");
 // chart
 (function(){const W=900,H=360,m={l:50,r:150,t:14,b:36};const ev=EVENTS;const ys=ev.flatMap(e=>e.y);const y0=Math.min(...ys,-70),y1=Math.max(...ys,10);
  const X=i=>m.l+i*(W-m.l-m.r)/21,Y=v=>m.t+(y1-v)*(H-m.t-m.b)/(y1-y0);const cols=["#c62828","#e07b00","#8e44ad","#7f8c8d","#0b5ed7","#1b7f4b"];
@@ -120,7 +119,7 @@ $("replay").onclick=()=>replay("VST");
  $("chart").innerHTML=s+'</svg>';
  $("evt").innerHTML='<table><tr><th>사건</th><th class="n">CAR[0,1]</th><th class="n">CAR[0,5]</th><th class="n">CAR[0,20]</th><th class="n">β</th></tr>'+ev.map(e=>`<tr><td>${esc(e.name)} (${esc(e.t0)})</td><td class="n neg">${e.car1}%</td><td class="n neg">${e.car5}%</td><td class="n ${e.car20<-1?'neg':''}">${e.car20}%</td><td class="n">${e.beta}</td></tr>`).join('')+'</table>'})();
 // PWA
-if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});
+if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
 let dp=null;addEventListener("beforeinstallprompt",e=>{e.preventDefault();dp=e;$("install").style.display="inline-block"});
 $("install").onclick=async()=>{if(dp){dp.prompt();dp=null;$("install").style.display="none"}};
 </script></body></html>
